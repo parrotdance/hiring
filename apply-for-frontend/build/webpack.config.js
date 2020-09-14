@@ -3,7 +3,6 @@ const join = (...args) => path.join(__dirname, '..', ...args)
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
-  mode: 'development',
   entry: join('src', 'index.tsx'),
   output: {
     filename: '[name].js',
@@ -22,6 +21,12 @@ module.exports = {
         exclude: /(node_modules)/,
         use: {
           loader: 'babel-loader'
+        }
+      },
+      {
+        test: /\.csv$/,
+        use: {
+          loader: join('build', 'csv-loader.js')
         }
       }
     ]

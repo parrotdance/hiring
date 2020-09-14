@@ -1,5 +1,10 @@
 import React from 'react'
+import Table from './Table'
 
 export default function App() {
-  return <h1>Hello, world!</h1>
+  return (
+    <div>
+      <Table />
+    </div>
+  )
 }
