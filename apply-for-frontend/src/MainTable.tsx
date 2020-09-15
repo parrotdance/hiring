@@ -1,13 +1,9 @@
 import day from 'dayjs'
 import React from 'react'
-import categoryData from './assets/categories.csv'
 import Table from './components/Table'
 import TableColumn from './components/TableColumn'
+import categoryMap from './utils/categoryMap'
 
-const categoryMap = categoryData.reduce(
-  (res, line) => Object.assign(res, { [line['id']]: line['name'] }),
-  {}
-)
 export default function MainTable(props: { data: Array<CSVLine> }) {
   return (
     <div className="table">

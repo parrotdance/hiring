@@ -6,3 +6,17 @@
 .filter-form {
   margin-left: 14px;
 }
+.filter-form-item {
+  margin-bottom: 12px;
+}
+.filter-form-item-label {
+  display: inline-block;
+  width: 100px;
+  text-align: right;
+  margin-right: 24px;
+}
+select,
+input {
+  display: inline-block;
+  width: 200px;
+}
