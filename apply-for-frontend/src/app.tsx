@@ -1,8 +1,8 @@
 import day from 'dayjs'
 import React from 'react'
 import billData from './assets/bill.csv'
-import Filter from './Filter'
 import MainTable from './MainTable'
+import Sidebar from './Sidebar'
 import EventBus from './utils/EventBus'
 import { APPEND_NEW_BILL, UPDATE_FILTER_MONTH } from './utils/EventType'
 
@@ -10,6 +10,8 @@ type TableData = Array<CSVLine>
 interface AppState {
   tableData: TableData
   applyFilter: Dictionary
+  totalIncome: number
+  totalPayment: number
 }
 
 const buildMonthDataIndex = (source: TableData) =>
@@ -26,7 +28,8 @@ export default class App extends React.Component<{}, AppState> {
     super(props)
     this.state = {
       tableData: billData,
-      applyFilter: {}
+      applyFilter: {},
+      ...this.getTotalAmount(billData)
     }
   }
   componentDidMount() {
@@ -43,21 +46,37 @@ export default class App extends React.Component<{}, AppState> {
     })
     this.updateTableDataByFilters()
   }
+  getTotalAmount(
+    tableData: TableData
+  ): { totalPayment: number; totalIncome: number } {
+    return tableData.reduce(
+      (res, row) => {
+        if (row.type === '0') res.totalPayment += Number(row.amount)
+        else res.totalIncome += Number(row.amount)
+        return res
+      },
+      { totalPayment: 0, totalIncome: 0 }
+    )
+  }
   updateTableDataByFilters() {
+    let tableData: TableData
     Object.entries(this.state.applyFilter).forEach(([type, value]) => {
       switch (type) {
         case 'month':
           if (value > 0) {
-            const newTableData = monthDataIndex[value]
-            this.setState({ tableData: newTableData })
+            tableData = monthDataIndex[value]
           } else {
-            this.setState({ tableData: billData })
+            tableData = billData
           }
           break
         default:
           return
       }
     })
+    if (tableData) {
+      const { totalPayment, totalIncome } = this.getTotalAmount(tableData)
+      this.setState({ tableData, totalPayment, totalIncome })
+    }
   }
   appendTableData(newData: CSVLine) {
     billData.push(newData)
@@ -68,7 +87,10 @@ export default class App extends React.Component<{}, AppState> {
     return (
       <div className="app">
         <MainTable data={this.state.tableData} />
-        <Filter />
+        <Sidebar
+          totalIncome={this.state.totalIncome}
+          totalPayment={this.state.totalPayment}
+        />
       </div>
     )
   }

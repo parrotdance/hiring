@@ -10,7 +10,11 @@ interface AppendForm {
   category: string
   amount: string
 }
-interface FilterState {
+interface SidebarProps {
+  totalIncome: number
+  totalPayment: number
+}
+interface SidebarState {
   currentFilterMonth: number
   appendForm: AppendForm
 }
@@ -34,7 +38,10 @@ const categoryList = Object.entries(categoryMap).map(([hash, name]) => ({
   hash,
   name
 }))
-export default class Filter extends React.Component<{}, FilterState> {
+export default class Sidebar extends React.Component<
+  SidebarProps,
+  SidebarState
+> {
   constructor(props) {
     super(props)
     this.state = {
@@ -82,10 +89,21 @@ export default class Filter extends React.Component<{}, FilterState> {
     return (
       <form className="filter-form">
         <div>
+          <h3>Total</h3>
+          <div className="filter-form-item">
+            <label className="filter-form-item-label">Income:</label>
+            <span>{this.props.totalIncome}</span>
+          </div>
+          <div className="filter-form-item">
+            <label className="filter-form-item-label">Payment:</label>
+            <span>{this.props.totalPayment}</span>
+          </div>
+        </div>
+        <div>
           <h3>Filter</h3>
           <div className="filter-form-item">
             <label className="filter-form-item-label" htmlFor="month">
-              By month:{' '}
+              By month:
             </label>
             <select
               style={{ width: '208px' }}
@@ -107,7 +125,7 @@ export default class Filter extends React.Component<{}, FilterState> {
           <div>
             <div className="filter-form-item">
               <label className="filter-form-item-label" htmlFor="type">
-                Type:{' '}
+                Type:
               </label>
               <select
                 style={{ width: '208px' }}
@@ -122,7 +140,7 @@ export default class Filter extends React.Component<{}, FilterState> {
             </div>
             <div className="filter-form-item">
               <label className="filter-form-item-label" htmlFor="time">
-                Time:{' '}
+                Time:
               </label>
               <input
                 type="text"
@@ -133,7 +151,7 @@ export default class Filter extends React.Component<{}, FilterState> {
             </div>
             <div className="filter-form-item">
               <label className="filter-form-item-label" htmlFor="category">
-                Category:{' '}
+                Category:
               </label>
               <select
                 style={{ width: '208px' }}
@@ -151,7 +169,7 @@ export default class Filter extends React.Component<{}, FilterState> {
             </div>
             <div className="filter-form-item">
               <label className="filter-form-item-label" htmlFor="amount">
-                Amount:{' '}
+                Amount:
               </label>
               <input
                 type="amount"
