@@ -28,6 +28,10 @@ module.exports = {
         use: {
           loader: join('build', 'csv-loader.js')
         }
+      },
+      {
+        test: /\.css$/i,
+        use: ['style-loader', 'css-loader']
       }
     ]
   },

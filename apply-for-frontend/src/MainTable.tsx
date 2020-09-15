@@ -10,8 +10,8 @@ const categoryMap = categoryData.reduce(
 )
 export default function MainTable(props: { data: Array<CSVLine> }) {
   return (
-    <div>
-      <Table data={props.data} width="800px">
+    <div className="table">
+      <Table data={props.data} width="640px">
         <TableColumn
           prop="type"
           label="收入/支出"
@@ -35,7 +35,7 @@ export default function MainTable(props: { data: Array<CSVLine> }) {
           label="金额"
           width="160px"
           formatter={(v, r: CSVLine) =>
-            `${r.type === '0' ? '-' : '+'}${Math.abs(Number(v))}`
+            `${r.type === '0' ? '-' : '+'}${Math.abs(Number(v)).toFixed(2)}`
           }
         />
       </Table>

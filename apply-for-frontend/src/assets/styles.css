@@ -1,0 +1,8 @@
+.app {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+.filter-form {
+  margin-left: 14px;
+}
