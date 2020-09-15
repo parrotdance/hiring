@@ -1,10 +1,22 @@
 import React from 'react'
-import Table from './Table'
+import billData from './assets/bill.csv'
+import MainTable from './MainTable'
 
-export default function App() {
-  return (
-    <div>
-      <Table />
-    </div>
-  )
+interface AppState {
+  tableData: Array<CSVLine>
+}
+export default class App extends React.Component<{}, AppState> {
+  constructor(props) {
+    super(props)
+    this.state = {
+      tableData: billData
+    }
+  }
+  render() {
+    return (
+      <div>
+        <MainTable data={this.state.tableData} />
+      </div>
+    )
+  }
 }
