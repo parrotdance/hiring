@@ -58,30 +58,30 @@ export default class Sidebar extends React.Component<
   setForm(newForm: Partial<AppendForm>) {
     this.setState({ appendForm: Object.assign(this.state.appendForm, newForm) })
   }
-  onFilterChange(e: SyntheticEvent<HTMLOptionElement>) {
+  onFilterChange = (e: SyntheticEvent<HTMLSelectElement>) => {
     const index = Number(e.currentTarget.value)
     if (index !== this.state.currentFilterMonth) {
       this.setState({ currentFilterMonth: index })
       EventBus.$emit(UPDATE_FILTER_MONTH, index)
     }
   }
-  onAppendTypeChange(e: SyntheticEvent<HTMLOptionElement>) {
+  onAppendTypeChange = (e: SyntheticEvent<HTMLSelectElement>) => {
     const type = e.currentTarget.value as '1' | '0'
     this.setForm({ type })
   }
-  onAppendTimeChange(e: SyntheticEvent<HTMLInputElement>) {
+  onAppendTimeChange = (e: SyntheticEvent<HTMLInputElement>) => {
     const time = e.currentTarget.value
     this.setForm({ time })
   }
-  onAppendCategoryChange(e: SyntheticEvent<HTMLOptionElement>) {
+  onAppendCategoryChange = (e: SyntheticEvent<HTMLSelectElement>) => {
     const category = e.currentTarget.value
     this.setForm({ category })
   }
-  onAppendAmountChange(e: SyntheticEvent<HTMLInputElement>) {
+  onAppendAmountChange = (e: SyntheticEvent<HTMLInputElement>) => {
     const amount = e.currentTarget.value
     this.setForm({ amount })
   }
-  onClickAppendData(e: SyntheticEvent<HTMLButtonElement>) {
+  onClickAppendData = (e: SyntheticEvent<HTMLButtonElement>) => {
     e.preventDefault()
     EventBus.$emit(APPEND_NEW_BILL, Object.assign({}, this.state.appendForm))
   }
@@ -110,7 +110,7 @@ export default class Sidebar extends React.Component<
               name="month"
               placeholder="Please Select"
               value={this.state.currentFilterMonth}
-              onChange={this.onFilterChange.bind(this)}
+              onChange={this.onFilterChange}
             >
               {renderMonths.map((month, i) => (
                 <option value={i} key={i}>
@@ -132,7 +132,7 @@ export default class Sidebar extends React.Component<
                 name="type"
                 placeholder="Please Select"
                 value={this.state.appendForm.type}
-                onChange={this.onAppendTypeChange.bind(this)}
+                onChange={this.onAppendTypeChange}
               >
                 <option value="0">Payment</option>
                 <option value="1">Income</option>
@@ -146,7 +146,7 @@ export default class Sidebar extends React.Component<
                 type="text"
                 placeholder="e.g. 2020-02-20"
                 value={this.state.appendForm.time}
-                onChange={this.onAppendTimeChange.bind(this)}
+                onChange={this.onAppendTimeChange}
               />
             </div>
             <div className="filter-form-item">
@@ -158,7 +158,7 @@ export default class Sidebar extends React.Component<
                 name="category"
                 placeholder="Please Select"
                 value={this.state.appendForm.category}
-                onChange={this.onAppendCategoryChange.bind(this)}
+                onChange={this.onAppendCategoryChange}
               >
                 {categoryList.map((category, i) => (
                   <option key={i} value={category.hash}>
@@ -175,13 +175,13 @@ export default class Sidebar extends React.Component<
                 type="amount"
                 placeholder="e.g. 9999"
                 value={this.state.appendForm.amount}
-                onChange={this.onAppendAmountChange.bind(this)}
+                onChange={this.onAppendAmountChange}
               />
             </div>
           </div>
         </div>
         <div style={{ textAlign: 'right' }}>
-          <button onClick={this.onClickAppendData.bind(this)}>Append</button>
+          <button onClick={this.onClickAppendData}>Append</button>
         </div>
       </form>
     )

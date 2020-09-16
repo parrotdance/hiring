@@ -33,14 +33,14 @@ export default class App extends React.Component<{}, AppState> {
     }
   }
   componentDidMount() {
-    EventBus.$on(UPDATE_FILTER_MONTH, this.setMonthFilter.bind(this))
-    EventBus.$on(APPEND_NEW_BILL, this.appendTableData.bind(this))
+    EventBus.$on(UPDATE_FILTER_MONTH, this.setMonthFilter)
+    EventBus.$on(APPEND_NEW_BILL, this.appendTableData)
   }
   componentWillUnmount() {
-    EventBus.$off(UPDATE_FILTER_MONTH, this.setMonthFilter.bind(this))
-    EventBus.$off(APPEND_NEW_BILL, this.appendTableData.bind(this))
+    EventBus.$off(UPDATE_FILTER_MONTH, this.setMonthFilter)
+    EventBus.$off(APPEND_NEW_BILL, this.appendTableData)
   }
-  setMonthFilter(month: number) {
+  setMonthFilter = (month: number) => {
     this.setState({
       applyFilter: Object.assign(this.state.applyFilter, { month })
     })
@@ -78,7 +78,7 @@ export default class App extends React.Component<{}, AppState> {
       this.setState({ tableData, totalPayment, totalIncome })
     }
   }
-  appendTableData(newData: CSVLine) {
+  appendTableData = (newData: CSVLine) => {
     billData.push(newData)
     monthDataIndex = buildMonthDataIndex(billData) // after source data changed, the index should be rebuilded
     this.updateTableDataByFilters()
