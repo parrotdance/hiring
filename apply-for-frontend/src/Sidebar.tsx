@@ -1,7 +1,11 @@
 import React, { SyntheticEvent } from 'react'
 import categoryMap from './utils/categoryMap'
 import EventBus from './utils/EventBus'
-import { APPEND_NEW_BILL, UPDATE_FILTER_MONTH } from './utils/EventType'
+import {
+  APPEND_NEW_BILL,
+  UPDATE_FILTER_CATEGORY,
+  UPDATE_FILTER_MONTH
+} from './utils/EventType'
 
 type TimeStampStr = string
 interface AppendForm {
@@ -16,6 +20,7 @@ interface SidebarProps {
 }
 interface SidebarState {
   currentFilterMonth: number
+  currentFilterCategory: string
   appendForm: AppendForm
 }
 
@@ -46,6 +51,7 @@ export default class Sidebar extends React.Component<
     super(props)
     this.state = {
       currentFilterMonth: 0,
+      currentFilterCategory: '',
       appendForm: {
         type: '0',
         time: '',
@@ -58,11 +64,18 @@ export default class Sidebar extends React.Component<
   setForm(newForm: Partial<AppendForm>) {
     this.setState({ appendForm: Object.assign(this.state.appendForm, newForm) })
   }
-  onFilterChange = (e: SyntheticEvent<HTMLSelectElement>) => {
+  onFilterMonthChange = (e: SyntheticEvent<HTMLSelectElement>) => {
     const index = Number(e.currentTarget.value)
     if (index !== this.state.currentFilterMonth) {
       this.setState({ currentFilterMonth: index })
       EventBus.$emit(UPDATE_FILTER_MONTH, index)
+    }
+  }
+  onFilterCategoryChange = (e: SyntheticEvent<HTMLSelectElement>) => {
+    const targetCategory = e.currentTarget.value
+    if (targetCategory !== this.state.currentFilterCategory) {
+      this.setState({ currentFilterCategory: targetCategory })
+      EventBus.$emit(UPDATE_FILTER_CATEGORY, targetCategory)
     }
   }
   onAppendTypeChange = (e: SyntheticEvent<HTMLSelectElement>) => {
@@ -110,13 +123,33 @@ export default class Sidebar extends React.Component<
               name="month"
               placeholder="Please Select"
               value={this.state.currentFilterMonth}
-              onChange={this.onFilterChange}
+              onChange={this.onFilterMonthChange}
             >
               {renderMonths.map((month, i) => (
                 <option value={i} key={i}>
                   {month}
                 </option>
               ))}
+            </select>
+          </div>
+          <div className="filter-form-item">
+            <label className="filter-form-item-label" htmlFor="category">
+              By category:
+            </label>
+            <select
+              style={{ width: '208px' }}
+              name="category"
+              placeholder="Please Select"
+              value={this.state.currentFilterCategory}
+              onChange={this.onFilterCategoryChange}
+            >
+              {[{ hash: '', name: 'None' }, ...categoryList].map(
+                (category, i) => (
+                  <option value={category.hash} key={i}>
+                    {category.name}
+                  </option>
+                )
+              )}
             </select>
           </div>
         </div>

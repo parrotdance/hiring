@@ -1,10 +1,13 @@
-import day from 'dayjs'
 import React from 'react'
-import billData from './assets/bill.csv'
 import MainTable from './MainTable'
 import Sidebar from './Sidebar'
+import DataSource from './utils/DataSource'
 import EventBus from './utils/EventBus'
-import { APPEND_NEW_BILL, UPDATE_FILTER_MONTH } from './utils/EventType'
+import {
+  APPEND_NEW_BILL,
+  UPDATE_FILTER_CATEGORY,
+  UPDATE_FILTER_MONTH
+} from './utils/EventType'
 
 type TableData = Array<CSVLine>
 interface AppState {
@@ -14,26 +17,19 @@ interface AppState {
   totalPayment: number
 }
 
-const buildMonthDataIndex = (source: TableData) =>
-  source.reduce<Dictionary<TableData>>((map, row) => {
-    const month = day(row.time).month() + 1
-    return Object.assign(map, {
-      [month]: map[month] ? map[month].concat([row]) : [row]
-    })
-  }, {})
-let monthDataIndex = buildMonthDataIndex(billData)
-
 export default class App extends React.Component<{}, AppState> {
   constructor(props) {
     super(props)
+    const tableData = DataSource.getData()
     this.state = {
-      tableData: billData,
+      tableData,
       applyFilter: {},
-      ...this.getTotalAmount(billData)
+      ...this.getTotalAmount(tableData)
     }
   }
   componentDidMount() {
     EventBus.$on(UPDATE_FILTER_MONTH, this.setMonthFilter)
+    EventBus.$on(UPDATE_FILTER_CATEGORY, this.setCategoryFilter)
     EventBus.$on(APPEND_NEW_BILL, this.appendTableData)
   }
   componentWillUnmount() {
@@ -41,15 +37,15 @@ export default class App extends React.Component<{}, AppState> {
     EventBus.$off(APPEND_NEW_BILL, this.appendTableData)
   }
   setMonthFilter = (month: number) => {
-    this.setState({
-      applyFilter: Object.assign(this.state.applyFilter, { month })
-    })
-    this.updateTableDataByFilters()
+    const newTableData = DataSource.applyFilter({ month }).getData()
+    this.updateTableData(newTableData)
   }
-  getTotalAmount(
-    tableData: TableData
-  ): { totalPayment: number; totalIncome: number } {
-    return tableData.reduce(
+  setCategoryFilter = (category: string) => {
+    const newTableData = DataSource.applyFilter({ category }).getData()
+    this.updateTableData(newTableData)
+  }
+  getTotalAmount(tableData: TableData) {
+    return tableData.reduce<{ totalPayment: number; totalIncome: number }>(
       (res, row) => {
         if (row.type === '0') res.totalPayment += Number(row.amount)
         else res.totalIncome += Number(row.amount)
@@ -58,30 +54,13 @@ export default class App extends React.Component<{}, AppState> {
       { totalPayment: 0, totalIncome: 0 }
     )
   }
-  updateTableDataByFilters() {
-    let tableData: TableData
-    Object.entries(this.state.applyFilter).forEach(([type, value]) => {
-      switch (type) {
-        case 'month':
-          if (value > 0) {
-            tableData = monthDataIndex[value]
-          } else {
-            tableData = billData
-          }
-          break
-        default:
-          return
-      }
-    })
-    if (tableData) {
-      const { totalPayment, totalIncome } = this.getTotalAmount(tableData)
-      this.setState({ tableData, totalPayment, totalIncome })
-    }
+  updateTableData(tableData: TableData) {
+    const { totalPayment, totalIncome } = this.getTotalAmount(tableData)
+    this.setState({ tableData, totalPayment, totalIncome })
   }
-  appendTableData = (newData: CSVLine) => {
-    billData.push(newData)
-    monthDataIndex = buildMonthDataIndex(billData) // after source data changed, the index should be rebuilded
-    this.updateTableDataByFilters()
+  appendTableData = (row: CSVLine) => {
+    const newData = DataSource.appendToSource(row).getData()
+    this.updateTableData(newData)
   }
   render() {
     return (
