@@ -3,7 +3,7 @@ import { shallowMerge } from '.'
 import billData from '../assets/bill.csv'
 
 type TableData = Array<CSVLine>
-type FilterType = 'month' | 'category'
+type FilterType = 'month' | 'category' | 'sort-amount'
 type FilterOption = { [T in FilterType]?: any }
 type FilteredDataIndex = WeakMap<FilterOption, Array<CSVLine>>
 
@@ -45,7 +45,7 @@ class DataSource {
       ? source.filter(
           (row: CSVLine) => targetMonth === day(row.time).month() + 1
         )
-      : source
+      : Array.from(source)
   }
   private filterByCategory(
     source: TableData,
@@ -53,17 +53,37 @@ class DataSource {
   ): TableData {
     return targetCategory
       ? source.filter((row: CSVLine) => row.category === targetCategory)
-      : source
+      : Array.from(source)
+  }
+  private getSignedAmount(row: CSVLine): number {
+    return row.type === '0'
+      ? -Math.abs(Number(row.amount))
+      : Math.abs(Number(row.amount))
+  }
+  private sortByAmount(source: TableData, sorter: number): TableData {
+    return sorter === 0
+      ? Array.from(source)
+      : sorter > 0
+      ? Array.from(source).sort(
+          (a, b) => this.getSignedAmount(a) - this.getSignedAmount(b)
+        )
+      : Array.from(source).sort(
+          (a, b) => this.getSignedAmount(b) - this.getSignedAmount(a)
+        )
   }
   public appendToSource(row: CSVLine): this {
     this._sourceData.push(row)
-    this._filteredDataCache = new WeakMap() // clear cahe because source data has changed
+    this._filtersCache = []
+    this._filteredDataCache = new WeakMap() // clear cache because source data has changed
     this.applyFilter() // re-compute data for render
     return this
   }
 
   public applyFilter(option?: FilterOption): this {
-    const newFilter: FilterOption = shallowMerge(this._applyedFilter, option)
+    const newFilter: FilterOption = shallowMerge(
+      this._applyedFilter,
+      option || {}
+    )
     const existIndex = this.findFilterIndex(newFilter)
     this._applyedFilter = newFilter
     if (existIndex > -1) {
@@ -79,16 +99,14 @@ class DataSource {
             return this.filterByMonth(res, value)
           case 'category':
             return this.filterByCategory(res, value)
+          case 'sort-amount':
+            return this.sortByAmount(res, value)
         }
       }, this._sourceData)
       this._filtersCache.push(newFilter)
       this._filteredDataCache.set(newFilter, filteredData)
       this._renderData = filteredData
     }
-    return this
-  }
-  public clearFilter(): this {
-    this._renderData = this._sourceData
     return this
   }
   public getData(): TableData {

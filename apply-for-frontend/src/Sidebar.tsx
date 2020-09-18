@@ -4,7 +4,8 @@ import EventBus from './utils/EventBus'
 import {
   APPEND_NEW_BILL,
   UPDATE_FILTER_CATEGORY,
-  UPDATE_FILTER_MONTH
+  UPDATE_FILTER_MONTH,
+  UPDATE_SORTER_AMOUNT
 } from './utils/EventType'
 
 type TimeStampStr = string
@@ -21,6 +22,7 @@ interface SidebarProps {
 interface SidebarState {
   currentFilterMonth: number
   currentFilterCategory: string
+  currentSorterAmount: number
   appendForm: AppendForm
 }
 
@@ -39,6 +41,11 @@ const months = [
   'Dec.'
 ]
 const renderMonths = ['None', ...months]
+const amountSorter = [
+  { name: 'None', value: 0 },
+  { name: 'Descending', value: -1 },
+  { name: 'Ascending', value: 1 }
+]
 const categoryList = Object.entries(categoryMap).map(([hash, name]) => ({
   hash,
   name
@@ -52,6 +59,7 @@ export default class Sidebar extends React.Component<
     this.state = {
       currentFilterMonth: 0,
       currentFilterCategory: '',
+      currentSorterAmount: 0,
       appendForm: {
         type: '0',
         time: '',
@@ -76,6 +84,13 @@ export default class Sidebar extends React.Component<
     if (targetCategory !== this.state.currentFilterCategory) {
       this.setState({ currentFilterCategory: targetCategory })
       EventBus.$emit(UPDATE_FILTER_CATEGORY, targetCategory)
+    }
+  }
+  onSorterAmountChange = (e: SyntheticEvent<HTMLSelectElement>) => {
+    const targetSorter = Number(e.currentTarget.value)
+    if (targetSorter !== this.state.currentSorterAmount) {
+      this.setState({ currentSorterAmount: targetSorter })
+      EventBus.$emit(UPDATE_SORTER_AMOUNT, targetSorter)
     }
   }
   onAppendTypeChange = (e: SyntheticEvent<HTMLSelectElement>) => {
@@ -150,6 +165,27 @@ export default class Sidebar extends React.Component<
                   </option>
                 )
               )}
+            </select>
+          </div>
+        </div>
+        <div>
+          <h3>Sorter</h3>
+          <div className="filter-form-item">
+            <label className="filter-form-item-label" htmlFor="sort-amount">
+              By amount:
+            </label>
+            <select
+              style={{ width: '208px' }}
+              name="sort-amount"
+              placeholder="Please Select"
+              value={this.state.currentSorterAmount}
+              onChange={this.onSorterAmountChange}
+            >
+              {amountSorter.map((sorter) => (
+                <option value={sorter.value} key={sorter.value}>
+                  {sorter.name}
+                </option>
+              ))}
             </select>
           </div>
         </div>

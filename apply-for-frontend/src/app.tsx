@@ -6,7 +6,8 @@ import EventBus from './utils/EventBus'
 import {
   APPEND_NEW_BILL,
   UPDATE_FILTER_CATEGORY,
-  UPDATE_FILTER_MONTH
+  UPDATE_FILTER_MONTH,
+  UPDATE_SORTER_AMOUNT
 } from './utils/EventType'
 
 type TableData = Array<CSVLine>
@@ -30,6 +31,7 @@ export default class App extends React.Component<{}, AppState> {
   componentDidMount() {
     EventBus.$on(UPDATE_FILTER_MONTH, this.setMonthFilter)
     EventBus.$on(UPDATE_FILTER_CATEGORY, this.setCategoryFilter)
+    EventBus.$on(UPDATE_SORTER_AMOUNT, this.setAmountSorter)
     EventBus.$on(APPEND_NEW_BILL, this.appendTableData)
   }
   componentWillUnmount() {
@@ -44,11 +46,18 @@ export default class App extends React.Component<{}, AppState> {
     const newTableData = DataSource.applyFilter({ category }).getData()
     this.updateTableData(newTableData)
   }
+  setAmountSorter = (sorter: number) => {
+    const newTableData = DataSource.applyFilter({
+      'sort-amount': sorter
+    }).getData()
+    this.updateTableData(newTableData)
+  }
   getTotalAmount(tableData: TableData) {
     return tableData.reduce<{ totalPayment: number; totalIncome: number }>(
       (res, row) => {
-        if (row.type === '0') res.totalPayment += Number(row.amount)
-        else res.totalIncome += Number(row.amount)
+        const num = Math.abs(Number(row.amount))
+        if (row.type === '0') res.totalPayment += num
+        else res.totalIncome += num
         return res
       },
       { totalPayment: 0, totalIncome: 0 }
