@@ -45,7 +45,7 @@ class DataSource {
       ? source.filter(
           (row: CSVLine) => targetMonth === day(row.time).month() + 1
         )
-      : Array.from(source)
+      : source
   }
   private filterByCategory(
     source: TableData,
@@ -53,7 +53,7 @@ class DataSource {
   ): TableData {
     return targetCategory
       ? source.filter((row: CSVLine) => row.category === targetCategory)
-      : Array.from(source)
+      : source
   }
   private getSignedAmount(row: CSVLine): number {
     return row.type === '0'
@@ -62,14 +62,10 @@ class DataSource {
   }
   private sortByAmount(source: TableData, sorter: number): TableData {
     return sorter === 0
-      ? Array.from(source)
+      ? source
       : sorter > 0
-      ? Array.from(source).sort(
-          (a, b) => this.getSignedAmount(a) - this.getSignedAmount(b)
-        )
-      : Array.from(source).sort(
-          (a, b) => this.getSignedAmount(b) - this.getSignedAmount(a)
-        )
+      ? source.sort((a, b) => this.getSignedAmount(a) - this.getSignedAmount(b))
+      : source.sort((a, b) => this.getSignedAmount(b) - this.getSignedAmount(a))
   }
   public appendToSource(row: CSVLine): this {
     this._sourceData.push(row)
@@ -102,7 +98,7 @@ class DataSource {
           case 'sort-amount':
             return this.sortByAmount(res, value)
         }
-      }, this._sourceData)
+      }, Array.from(this._sourceData))
       this._filtersCache.push(newFilter)
       this._filteredDataCache.set(newFilter, filteredData)
       this._renderData = filteredData
