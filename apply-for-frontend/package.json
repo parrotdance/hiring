@@ -8,11 +8,9 @@
     "build": "webpack --config build/webpack.config.js --mode production"
   },
   "keywords": [],
-  "author": "",
+  "author": "parrotdance95@gmail.com",
   "license": "ISC",
   "dependencies": {
-    "@types/react": "^16.9.49",
-    "@types/react-dom": "^16.9.8",
     "dayjs": "^1.8.35",
     "react": "^16.13.1",
     "react-dom": "^16.13.1"
@@ -24,6 +22,8 @@
     "@babel/preset-env": "^7.11.5",
     "@babel/preset-react": "^7.10.4",
     "@babel/preset-typescript": "^7.10.4",
+    "@types/react": "^16.9.49",
+    "@types/react-dom": "^16.9.8",
     "babel-loader": "^8.1.0",
     "core-js": "^3.6.5",
     "css-loader": "^4.3.0",

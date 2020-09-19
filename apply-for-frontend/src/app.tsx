@@ -36,6 +36,8 @@ export default class App extends React.Component<{}, AppState> {
   }
   componentWillUnmount() {
     EventBus.$off(UPDATE_FILTER_MONTH, this.setMonthFilter)
+    EventBus.$off(UPDATE_FILTER_CATEGORY, this.setCategoryFilter)
+    EventBus.$off(UPDATE_SORTER_AMOUNT, this.setAmountSorter)
     EventBus.$off(APPEND_NEW_BILL, this.appendTableData)
   }
   setMonthFilter = (month: number) => {
